@@ -31,7 +31,7 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
 
     console.log(lotteryNumber)
 
-    if (lotteryNumber.split("").filter(o => o.match(/[0-9]/) !== null).length !== 6) {
+    if (lotteryNumber.split("").filter(o => o.match(/[0-9]/) !== null).length !== 6 || lotteryNumber.length !== 6) {
       return res.status(401).json({
         status: 'failure',
         data: {
