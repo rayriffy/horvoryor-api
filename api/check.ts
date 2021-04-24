@@ -25,7 +25,7 @@ interface APIResult {
 const api = async (req: VercelRequest, res: VercelResponse) => {
   if ((req.method ?? '').toLowerCase() === 'post') {
     // get data
-    const { lotteryNumber = '0' } = req.query
+    const lotteryNumber = req.body.lotteryNumber as string
 
     // get lottery info
     const json = await axios.get<APIResult>('https://lotto.api.rayriffy.com/latest')
@@ -33,21 +33,19 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
     let isWin = []
 
     const promise1 = json.data.response.prizes.map(prize => {
-      return prize.number.map(number => {
-        if (number === lotteryNumber) {
-          isWin.push('win')
+      if (prize.number.includes(lotteryNumber)) {
+        isWin.push('win')
 
-          return res.status(200).send({
-            status: 'success',
-            data: {
-              lotteryNumber,
-              lotteryResult: prize.id,
-              lotteryReward: prize.reward,
-              lotterDateCycle: json.data.response.date,
-            },
-          })
-        }
-      })
+        return res.status(200).json({
+          status: 'success',
+          data: {
+            lotteryNumber,
+            lotteryResult: prize.id,
+            lotteryReward: prize.reward,
+            lotterDateCycle: json.data.response.date,
+          },
+        })
+      }
     })
   
     // Check for running numbers
@@ -63,7 +61,7 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
         ) {
           isWin.push('win')
 
-          return res.status(200).send({
+          return res.status(200).json({
             status: 'success',
             data: {
               lotteryNumber,
@@ -79,7 +77,7 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
     await Promise.all([promise1, promise2])
 
     if (isWin.length === 0) {
-      return res.status(200).send({
+      return res.status(200).json({
         status: 'success',
         data: {
           lotteryNumber,
@@ -90,7 +88,7 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
       })
     }
   } else {
-    res.send(405).send({
+    return res.status(405).json({
       status: 'failure',
       data: {
         message: 'invalid request method'
