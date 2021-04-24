@@ -25,6 +25,8 @@ interface APIResult {
 const api = async (req: VercelRequest, res: VercelResponse) => {
   if (['post', 'options'].includes((req.method ?? '').toLowerCase())) {
     // get data
+    console.log('req.body: ', req.body)
+    console.log('req.query: ', req.query)
     const lotteryNumber = req.body.lotteryNumber as string
 
     console.log(lotteryNumber)
