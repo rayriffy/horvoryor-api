@@ -27,6 +27,15 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
     // get data
     const lotteryNumber = req.body.lotteryNumber as string
 
+    if (lotteryNumber.split("").filter(o => o.match(/[0-9]/) !== null).length === 6) {
+      return res.status(401).json({
+        status: 'failure',
+        data: {
+          message: 'invalid-input',
+        },
+      })
+    }
+
     // get lottery info
     const json = await axios.get<APIResult>('https://lotto.api.rayriffy.com/latest')
 
@@ -91,7 +100,7 @@ const api = async (req: VercelRequest, res: VercelResponse) => {
     return res.status(405).json({
       status: 'failure',
       data: {
-        message: 'invalid request method'
+        message: 'invalid-method',
       },
     })
   }
